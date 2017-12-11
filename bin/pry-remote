@@ -1,4 +1,4 @@
 #!/usr/bin/env ruby
 
-require 'pry-remote'
-PryRemote::CLI.new.run
+require 'pry-remote-reloaded'
+PryRemoteReloaded::CLI.new.run

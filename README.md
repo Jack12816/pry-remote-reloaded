@@ -3,9 +3,13 @@
 A way to start Pry remotely and to connect to it using DRb. This allows to
 access the state of the running program from anywhere.
 
+**Heads up!** This is a fork of the excellent
+[pry-remote](https://github.com/Mon-Ouie/pry-remote) gem with some
+enhancements.
+
 # Installation
 
-    gem install pry-remote
+    gem install pry-remote-reloaded
 
 # Usage
 
@@ -24,7 +28,7 @@ Here's a program starting pry-remote:
 Running it will prompt you with a message telling you Pry is waiting for a
 program to connect itself to it:
 
-     [pry-remote] Waiting for client on drb://localhost:9876
+    [pry-remote] Waiting for client on drb://localhost:9876
 
 You can then connect yourself using ``pry-remote``:
 
@@ -55,4 +59,3 @@ You can then connect yourself using ``pry-remote``:
       [8] :y
     ]
     pry(#<Foo:0x00000001efb3b0>):3> ^D
-

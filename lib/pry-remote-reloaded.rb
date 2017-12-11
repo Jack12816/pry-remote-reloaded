@@ -4,7 +4,7 @@ require 'drb'
 require 'readline'
 require 'open3'
 
-module PryRemote
+module PryRemoteReloaded
   DefaultHost = ENV['PRY_REMOTE_DEFAULT_HOST'] || "127.0.0.1"
   DefaultPort = ENV['PRY_REMOTE_DEFAULT_PORT'] || 9876
 
@@ -151,13 +151,15 @@ module PryRemote
       @object  = object
       @options = options
 
-      @client = PryRemote::Client.new
+      @client = PryRemoteReloaded::Client.new
       DRb.start_service uri, @client
+    rescue Errno::EADDRINUSE => e
+      puts "[pry-remote] Port already in use: #{e.message}"
     end
 
     # Code that has to be called for Pry-remote to work properly
     def setup
-      @hooks = Pry::Hooks.new
+      @hooks = Pry::DEFAULT_HOOKS.dup
 
       @hooks.add_hook :before_eval, :pry_remote_capture do
         capture_output
@@ -173,7 +175,7 @@ module PryRemote
       Pry.config.pager, @old_pager = false, Pry.config.pager
 
       # As above, but for system config
-      Pry.config.system, @old_system = PryRemote::System, Pry.config.system
+      Pry.config.system, @old_system = PryRemoteReloaded::System, Pry.config.system
 
       Pry.config.editor, @old_editor = editor_proc, Pry.config.editor
     end
@@ -189,7 +191,7 @@ module PryRemote
 
       begin
         @client.kill
-      rescue DRb::DRbConnError
+      rescue DRb::DRbConnError, Errno::ECONNREFUSED
         puts "[pry-remote] Continuing to stop service"
       ensure
         puts "[pry-remote] Ensure stop service"
@@ -235,6 +237,8 @@ module PryRemote
       Pry.start(@object, @options.merge(:input => client.input_proxy,
                                         :output => client.output,
                                         :hooks => @hooks))
+    rescue => e
+      puts "[pry-remote] Error: #{e.message}"
     ensure
       teardown
     end
@@ -349,6 +353,10 @@ module PryRemote
       client.thread = Thread.current
 
       sleep
+    rescue Interrupt
+      Pry.run_command('exit', context: Pry.binding_for(Object.new))
+      puts "\n"
+    ensure
       DRb.stop_service
     end
 
@@ -370,8 +378,8 @@ class Object
   # @param [String]  host Host of the server
   # @param [Integer] port Port of the server
   # @param [Hash] options Options to be passed to Pry.start
-  def remote_pry(host = PryRemote::DefaultHost, port = PryRemote::DefaultPort, options = {})
-    PryRemote::Server.new(self, host, port, options).run
+  def remote_pry(host = PryRemoteReloaded::DefaultHost, port = PryRemoteReloaded::DefaultPort, options = {})
+    PryRemoteReloaded::Server.new(self, host, port, options).run
   end
 
   # a handy alias as many people may think the method is named after the gem

@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = "pry-remote"
+  s.name = "pry-remote-reloaded"
 
-  s.version = "0.1.8"
+  s.version = "1.0.0"
 
   s.summary     = "Connect to Pry remotely"
   s.description = "Connect to Pry remotely using DRb"
-  s.homepage    = "http://github.com/Mon-Ouie/pry-remote"
+  s.homepage    = "https://github.com/Jack12816/pry-remote-reloaded"
 
   s.email   = "mon.ouie@gmail.com"
   s.authors = ["Mon ouie"]
@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency "slop", "~> 3.0"
-  s.add_dependency "pry",  "~> 0.9"
+  s.add_dependency "pry",  ">= 0.9"
 
   s.executables = ["pry-remote"]
 end
