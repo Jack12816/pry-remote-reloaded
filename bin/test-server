@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/pry-remote-reloaded'
+
+def test!
+  pp :test
+end
+
+class Test
+  def initialize
+    @var = 1
+  end
+
+  def test!
+    binding.remote_pry
+  end
+end
+
+obj = Test.new
+
+loop do
+  binding.remote_pry
+end

@@ -159,7 +159,7 @@ module PryRemoteReloaded
 
     # Code that has to be called for Pry-remote to work properly
     def setup
-      @hooks = Pry::DEFAULT_HOOKS.dup
+      @hooks = Pry::Hooks.default
 
       @hooks.add_hook :before_eval, :pry_remote_capture do
         capture_output

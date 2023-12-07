@@ -1,3 +1,7 @@
+## 1.1.0 (2023-12-07)
+
+* Require Pry >= 0.14
+
 ## 1.0.0 (2017-12-13)
 
 * Relaxed the Pry dependencies version condition (>=0.9)
