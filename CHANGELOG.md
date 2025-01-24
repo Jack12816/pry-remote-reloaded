@@ -1,3 +1,7 @@
+## next
+
+* Added the drb dependency
+
 ## 1.1.0 (2023-12-07)
 
 * Require Pry >= 0.14
