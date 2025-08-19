@@ -7,6 +7,8 @@ require 'open3'
 module PryRemoteReloaded
   DefaultHost = ENV['PRY_REMOTE_DEFAULT_HOST'] || "127.0.0.1"
   DefaultPort = ENV['PRY_REMOTE_DEFAULT_PORT'] || 9876
+  DefaultURI = ENV.fetch('PRY_REMOTE_DEFAULT_URI',
+                         "druby://#{DefaultHost}:#{DefaultPort}")
 
   # A class to represent an input object created from DRb. This is used because
   # Pry checks for arity to know if a prompt should be passed to the object.
@@ -140,13 +142,12 @@ module PryRemoteReloaded
   end
 
   class Server
-    def self.run(object, host = DefaultHost, port = DefaultPort, options = {})
-      new(object, host, port, options).run
+    def self.run(object, uri: DefaultURI, **options)
+      new(object, uri:, **options).run
     end
 
-    def initialize(object, host = DefaultHost, port = DefaultPort, options = {})
-      @host    = host
-      @port    = port
+    def initialize(object, uri: DefaultURI, **options)
+      @uri = uri
 
       @object  = object
       @options = options
@@ -154,7 +155,7 @@ module PryRemoteReloaded
       @client = PryRemoteReloaded::Client.new
       DRb.start_service uri, @client
     rescue Errno::EADDRINUSE => e
-      puts "[pry-remote] Port already in use: #{e.message}"
+      puts "[pry-remote] Address already in use: #{e.message}"
     end
 
     # Code that has to be called for Pry-remote to work properly
@@ -249,16 +250,8 @@ module PryRemoteReloaded
     # @return [PryServer::Client] Client connecting to the pry-remote server
     attr_reader :client
 
-    # @return [String] Host of the server
-    attr_reader :host
-
-    # @return [Integer] Port of the server
-    attr_reader :port
-
     # @return [String] URI for DRb
-    def uri
-      "druby://#{host}:#{port}"
-    end
+    attr_reader :uri
   end
 
   # Parses arguments and allows to start the client.
@@ -272,6 +265,8 @@ module PryRemoteReloaded
                     default: DefaultHost
         conf.int '-p', '--port', "Port of the server (#{DefaultPort})",
                  default: DefaultPort
+        conf.string '-u', '--uri', 'URI of the server, instead of ' \
+                                   "server/port (#{DefaultURI})"
 
         conf.bool '-w', '--wait', 'Wait for the pry server to come up',
                   default: false
@@ -291,8 +286,11 @@ module PryRemoteReloaded
         end
       end
 
-      @host = opts[:server]
-      @port = opts[:port]
+      if opts[:uri]
+        @uri = opts[:uri]
+      else
+        @uri = "druby://#{opts[:server]}:#{opts[:port]}"
+      end
 
       @wait = opts[:wait]
       @persist = opts[:persist]
@@ -304,16 +302,8 @@ module PryRemoteReloaded
       exit 1
     end
 
-    # @return [String] Host of the server
-    attr_reader :host
-
-    # @return [Integer] Port of the server
-    attr_reader :port
-
     # @return [String] URI for DRb
-    def uri
-      "druby://#{host}:#{port}"
-    end
+    attr_reader :uri
 
     attr_reader :wait
     attr_reader :persist
@@ -387,11 +377,10 @@ end
 class Object
   # Starts a remote Pry session
   #
-  # @param [String]  host Host of the server
-  # @param [Integer] port Port of the server
-  # @param [Hash] options Options to be passed to Pry.start
-  def remote_pry(host = PryRemoteReloaded::DefaultHost, port = PryRemoteReloaded::DefaultPort, options = {})
-    PryRemoteReloaded::Server.new(self, host, port, options).run
+  # @param uri [String] URI for DRb server
+  # @param options [Hash{Symbol => Mixed}] options to be passed to Pry.start
+  def remote_pry(uri: PryRemoteReloaded::DefaultURI, **options)
+    PryRemoteReloaded::Server.new(self, uri:, **options).run
   end
 
   # a handy alias as many people may think the method is named after the gem

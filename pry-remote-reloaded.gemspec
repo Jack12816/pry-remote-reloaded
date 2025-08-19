@@ -17,6 +17,8 @@ Gem::Specification.new do |s|
   s.files |= Dir["*.md"]
   s.files << "LICENSE"
 
+  s.required_ruby_version = '>= 3.1'
+
   s.require_paths = ["lib"]
 
   s.add_dependency "slop", "~> 4.10"
