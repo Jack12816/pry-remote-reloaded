@@ -1,3 +1,8 @@
+## next
+
+* Upgraded to slop 4.x (#3)
+* Require Pry >= 0.15 (#3)
+
 ## 1.2.0 (2025-01-24)
 
 * Added the drb dependency

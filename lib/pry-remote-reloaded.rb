@@ -264,32 +264,44 @@ module PryRemoteReloaded
   # Parses arguments and allows to start the client.
   class CLI
     def initialize(args = ARGV)
-      params = Slop.parse args, :help => true do
-        banner "#$PROGRAM_NAME [OPTIONS]"
+      opts = Slop.parse do |conf|
+        conf.banner = "#$PROGRAM_NAME [OPTIONS]"
+        conf.separator
 
-        on :s, :server=, "Host of the server (#{DefaultHost})", :argument => :optional,
-           :default => DefaultHost
-        on :p, :port=, "Port of the server (#{DefaultPort})", :argument => :optional,
-           :as => Integer, :default => DefaultPort
-        on :w, :wait, "Wait for the pry server to come up",
-           :default => false
-        on :r, :persist, "Persist the client to wait for the pry server to come up each time",
-           :default => false
-        on :c, :capture, "Captures $stdout and $stderr from the server (true)",
-           :default => true
-        on :f, "Disables loading of .pryrc and its plugins, requires, and command history "
+        conf.string '-s', '--server', "Host of the server (#{DefaultHost})",
+                    default: DefaultHost
+        conf.int '-p', '--port', "Port of the server (#{DefaultPort})",
+                 default: DefaultPort
+
+        conf.bool '-w', '--wait', 'Wait for the pry server to come up',
+                  default: false
+        conf.bool '-r', '--persist', 'Persist the client to wait for the ' \
+                                     'pry server to come up each time',
+                  default: false
+        conf.bool '-c', '--capture', 'Captures $stdout and $stderr from ' \
+                                     'the server (true)',
+                  default: true
+        conf.bool '-f', 'Disables loading of .pryrc and its plugins, ' \
+                        'requires, and command history',
+                  default: false
+
+        conf.on '-h', '--help' do
+          puts conf
+          exit
+        end
       end
 
-      exit if params.help?
+      @host = opts[:server]
+      @port = opts[:port]
 
-      @host = params[:server]
-      @port = params[:port]
+      @wait = opts[:wait]
+      @persist = opts[:persist]
+      @capture = opts[:capture]
 
-      @wait = params[:wait]
-      @persist = params[:persist]
-      @capture = params[:capture]
-
-      Pry.initial_session_setup unless params[:f]
+      Pry.initial_session_setup unless opts[:f]
+    rescue Slop::UnknownOption => e
+      $stderr.puts(e)
+      exit 1
     end
 
     # @return [String] Host of the server
