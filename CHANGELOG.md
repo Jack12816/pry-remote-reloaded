@@ -1,4 +1,4 @@
-## next
+## 3.0.0 (2025-08-20)
 
 * Allow configuring server URI instead of host and port (#4)
   * The CLI still allows to configure server/port, but allows to pass the
