@@ -19,5 +19,8 @@ end
 obj = Test.new
 
 loop do
-  binding.remote_pry
+  binding.remote_pry # defaults to druby://
+
+  # use with: $ pry-remote -u 'drbunix:/tmp/pry.socket'
+  # binding.remote_pry(uri: 'drbunix:/tmp/pry.socket')
 end

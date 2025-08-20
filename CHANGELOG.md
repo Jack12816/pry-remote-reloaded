@@ -1,3 +1,14 @@
+## next
+
+* Allow configuring server URI instead of host and port (#4)
+  * The CLI still allows to configure server/port, but allows to pass the
+    URI which takes precedence
+  * This is a breaking change for `Object#remote_pry` as its signature is
+    changed to keyword arguments (`uri:, **options`)
+  * The `PryRemoteReloaded::Server.new` and `PryRemoteReloaded::Server.run`
+    signatures also changed to keyword arguments,
+    but thats only for internal use
+
 ## 2.0.0 (205-08-19)
 
 * Upgraded to slop 4.x (#3)

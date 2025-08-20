@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pry-remote-reloaded (1.2.0)
+    pry-remote-reloaded (2.0.0)
       drb (~> 2.2)
       pry (>= 0.15)
       slop (~> 4.10)
